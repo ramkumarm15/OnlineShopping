@@ -13,7 +13,7 @@ namespace OnlineShopping.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "User_Admin")]
     public class ProductController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
