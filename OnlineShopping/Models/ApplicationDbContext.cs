@@ -14,13 +14,5 @@ namespace OnlineShopping.Models
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItems> CartItems { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<BillingAddress>(entity =>
-            {
-                entity.HasIndex(i => i.AddressId).IsUnique();
-                entity.Property(i => i.AddressId).HasDefaultValueSql("bill_ + CAST(Id AS VARCHAR(5))");
-            });
-        }
     }
 }
