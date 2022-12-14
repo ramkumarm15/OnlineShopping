@@ -18,11 +18,12 @@ namespace OnlineShopping.Controllers
     public class BillingAddressController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
+        private BillingAddressResponse response;
 
         public BillingAddressController(ApplicationDbContext context)
         {
             _context = context;
+            response = new BillingAddressResponse();
         }
 
         /// <summary>
@@ -41,10 +42,11 @@ namespace OnlineShopping.Controllers
                 .ToListAsync();
             if (billingAddress == null)
             {
-                return BadRequest(new { message = "No address found" });
+                response.Message = "No address found";
+                return BadRequest(response);
             }
 
-            return Ok(new { data = billingAddress });
+            return Ok(billingAddress);
 
         }
 
@@ -67,10 +69,11 @@ namespace OnlineShopping.Controllers
                     .FirstOrDefaultAsync();
 
 
-                return Ok(new { data = billingAddress });
+                return Ok(billingAddress);
 
             }
-            return BadRequest(new { message = "Address not found" });
+            response.Message = "No address found";
+            return BadRequest(response);
         }
 
 
@@ -104,9 +107,13 @@ namespace OnlineShopping.Controllers
 
                 _context.BillingAddresses.Update(billingAddressToBeUpdated);
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "Address updated" });
+
+                response.Message = "Address updated";
+                return Ok(response);
             }
-            return BadRequest(new { message = "Cannot find the address" });
+
+            response.Message = "Address not found";
+            return BadRequest(response);
         }
 
         /// <summary>
@@ -140,8 +147,8 @@ namespace OnlineShopping.Controllers
             _context.BillingAddresses.Add(billingAddressToBeAdded);
             await _context.SaveChangesAsync();
 
-
-            return Ok(new { message = "Address Added Successfully" });
+            response.Message = "Address added";
+            return Ok(response);
 
         }
 
@@ -165,12 +172,14 @@ namespace OnlineShopping.Controllers
 
                 _context.BillingAddresses.Remove(billingAddressToBeDeleted);
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "Deleted successfully" });
+
+                response.Message = "Address deleted";
+                return Ok(response);
             }
 
-            return BadRequest(new { message = "Address not found" });
+            response.Message = "Address not found";
+            return BadRequest(response);
         }
-
 
         private bool BillingAddressExists(int id)
         {

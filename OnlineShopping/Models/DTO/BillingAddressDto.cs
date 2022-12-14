@@ -15,4 +15,9 @@ namespace OnlineShopping.Models.DTO
         [Required] public int PostalCode { get; set; }
         [Required] public double MobileNumber { get; set; }
     }
+
+    public class BillingAddressResponse
+    {
+        public string Message { get; set; }
+    }
 }
