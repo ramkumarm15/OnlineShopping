@@ -31,7 +31,7 @@ namespace OnlineShopping.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BillingAddress>>> GetBillingAddresses()
+        public async Task<ActionResult> GetBillingAddresses()
         {
 
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
@@ -56,7 +56,7 @@ namespace OnlineShopping.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<BillingAddress>> GetBillingAddress([FromRoute] int id)
+        public async Task<ActionResult> GetBillingAddress([FromRoute] int id)
         {
             if (BillingAddressExists(id))
             {
@@ -84,7 +84,7 @@ namespace OnlineShopping.Controllers
         /// <param name="billingAddress"></param>
         /// <returns></returns>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> PutBillingAddress([FromRoute] int id,
+        public async Task<ActionResult> PutBillingAddress([FromRoute] int id,
             [FromBody] BillingAddressDto billingAddress)
         {
 
@@ -122,7 +122,7 @@ namespace OnlineShopping.Controllers
         /// <param name="billingAddress"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<BillingAddress>> PostBillingAddress([FromBody] BillingAddressDto billingAddress)
+        public async Task<ActionResult> PostBillingAddress([FromBody] BillingAddressDto billingAddress)
         {
 
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
@@ -159,7 +159,7 @@ namespace OnlineShopping.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteBillingAddress([FromRoute] int id)
+        public async Task<ActionResult> DeleteBillingAddress([FromRoute] int id)
         {
             if (BillingAddressExists(id))
             {

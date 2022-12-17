@@ -41,7 +41,7 @@ namespace OnlineShopping.Controllers
         /// <exception cref="Exception"></exception>
         [HttpPost]
         [Route("CreateToken")]
-        public async Task<IActionResult> Token(Login? user)
+        public async Task<ActionResult> Token(Login? user)
         {
             if (!string.IsNullOrEmpty(user.Username) && !string.IsNullOrEmpty(user.Password))
             {

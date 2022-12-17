@@ -43,13 +43,8 @@ namespace OnlineShopping.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:int}"), AllowAnonymous]
-        public async Task<ActionResult<Product>> GetProduct([FromRoute] int id)
+        public async Task<ActionResult> GetProduct([FromRoute] int id)
         {
-            if (id < 0)
-            {
-                return BadRequest(new { message = "Provide valid Product Id" });
-            }
-
             if (ProductExists(id))
             {
                 Product? product = await _context.Products.FindAsync(id);
@@ -67,13 +62,8 @@ namespace OnlineShopping.Controllers
         /// <param name="product"></param>
         /// <returns></returns>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> PutProduct([FromRoute] int id, [FromBody] ProductDto product)
+        public async Task<ActionResult> PutProduct([FromRoute] int id, [FromBody] ProductDto product)
         {
-            if (id < 0)
-            {
-                return BadRequest(new { message = "Provide valid Product Id" });
-            }
-
             if (ProductExists(id))
             {
 
@@ -89,7 +79,7 @@ namespace OnlineShopping.Controllers
                 await _context.SaveChangesAsync();
 
                 response.Message = "Product updated";
-                return BadRequest(response);
+                return Ok(response);
 
             }
 
@@ -103,7 +93,7 @@ namespace OnlineShopping.Controllers
         /// <param name="product"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct([FromBody] ProductDto product)
+        public async Task<ActionResult> PostProduct([FromBody] ProductDto product)
         {
             Product? newProduct = new Product();
 
@@ -139,7 +129,7 @@ namespace OnlineShopping.Controllers
                 await _context.SaveChangesAsync();
 
                 response.Message = "Product deleted";
-                return BadRequest(response);
+                return Ok(response);
             }
 
             response.Message = "Product not found";
@@ -148,7 +138,7 @@ namespace OnlineShopping.Controllers
 
         private bool ProductExists(int id)
         {
-            return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _context.Products.Any(e => e.Id == id);
         }
     }
 }

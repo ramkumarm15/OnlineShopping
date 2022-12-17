@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AnalysisConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sonarsource.com/msbuild/integration/2015/1">
-  <SonarConfigDir>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf</SonarConfigDir>
-  <SonarOutputDir>D:\Angular\MentorTask\OnlineShopping\.sonarqube\out</SonarOutputDir>
-  <SonarBinDir>D:\Angular\MentorTask\OnlineShopping\.sonarqube\bin</SonarBinDir>
-  <SonarScannerWorkingDirectory>D:\Angular\MentorTask\OnlineShopping</SonarScannerWorkingDirectory>
+  <SonarConfigDir>D:\Angular\MentorTask\.sonarqube\conf</SonarConfigDir>
+  <SonarOutputDir>D:\Angular\MentorTask\.sonarqube\out</SonarOutputDir>
+  <SonarBinDir>D:\Angular\MentorTask\.sonarqube\bin</SonarBinDir>
+  <SonarScannerWorkingDirectory>D:\Angular\MentorTask</SonarScannerWorkingDirectory>
   <HasBeginStepCommandLineCredentials>true</HasBeginStepCommandLineCredentials>
   <SonarQubeHostUrl>http://localhost:9000</SonarQubeHostUrl>
   <SonarQubeVersion>8.9.10.61524</SonarQubeVersion>
@@ -13,7 +13,7 @@
     <ConfigSetting Id="TfsUri" />
     <ConfigSetting Id="VsCoverageConverterToolPath" />
     <ConfigSetting Id="UnchangedFilesPath" />
-    <ConfigSetting Id="sonar.pullrequest.cache.basepath" Value="D:\Angular\MentorTask\OnlineShopping" />
+    <ConfigSetting Id="sonar.pullrequest.cache.basepath" Value="D:\Angular\MentorTask" />
     <ConfigSetting Id="settings.file.path" Value="C:\Users\Ramkumar\.dotnet\tools\.store\dotnet-sonarscanner\5.9.1\dotnet-sonarscanner\5.9.1\tools\net5.0\any\SonarQube.Analysis.xml" />
   </AdditionalConfig>
   <ServerSettings>
@@ -112,8 +112,8 @@
   <AnalyzersSettings>
     <AnalyzerSettings>
       <Language>cs</Language>
-      <RulesetPath>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf\Sonar-cs.ruleset</RulesetPath>
-      <DeactivatedRulesetPath>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf\Sonar-cs-none.ruleset</DeactivatedRulesetPath>
+      <RulesetPath>D:\Angular\MentorTask\.sonarqube\conf\Sonar-cs.ruleset</RulesetPath>
+      <DeactivatedRulesetPath>D:\Angular\MentorTask\.sonarqube\conf\Sonar-cs-none.ruleset</DeactivatedRulesetPath>
       <AnalyzerPlugins>
         <AnalyzerPlugin Key="csharp" Version="8.22.0.31243" StaticResourceName="SonarAnalyzer-8.22.0.31243.zip">
           <AssemblyPaths>
@@ -132,13 +132,13 @@
         </AnalyzerPlugin>
       </AnalyzerPlugins>
       <AdditionalFilePaths>
-        <Path>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf\cs\SonarLint.xml</Path>
+        <Path>D:\Angular\MentorTask\.sonarqube\conf\cs\SonarLint.xml</Path>
       </AdditionalFilePaths>
     </AnalyzerSettings>
     <AnalyzerSettings>
       <Language>vbnet</Language>
-      <RulesetPath>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf\Sonar-vbnet.ruleset</RulesetPath>
-      <DeactivatedRulesetPath>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf\Sonar-vbnet-none.ruleset</DeactivatedRulesetPath>
+      <RulesetPath>D:\Angular\MentorTask\.sonarqube\conf\Sonar-vbnet.ruleset</RulesetPath>
+      <DeactivatedRulesetPath>D:\Angular\MentorTask\.sonarqube\conf\Sonar-vbnet-none.ruleset</DeactivatedRulesetPath>
       <AnalyzerPlugins>
         <AnalyzerPlugin Key="csharp" Version="8.22.0.31243" StaticResourceName="SonarAnalyzer-8.22.0.31243.zip">
           <AssemblyPaths>
@@ -157,7 +157,7 @@
         </AnalyzerPlugin>
       </AnalyzerPlugins>
       <AdditionalFilePaths>
-        <Path>D:\Angular\MentorTask\OnlineShopping\.sonarqube\conf\vbnet\SonarLint.xml</Path>
+        <Path>D:\Angular\MentorTask\.sonarqube\conf\vbnet\SonarLint.xml</Path>
       </AdditionalFilePaths>
     </AnalyzerSettings>
   </AnalyzersSettings>
