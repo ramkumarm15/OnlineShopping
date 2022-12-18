@@ -3,21 +3,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using OnlineShopping.Controllers;
-using OnlineShopping.Models;
 using OnlineShopping.Models.DTO;
+using OnlineShopping.Models;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace OnlineShopping.Tests.AuthControllerTests
+namespace OnlineShopping.Tests
 {
-    [ExcludeFromCodeCoverage]
     public class AuthenticationControllerTest
     {
         private DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase("onlineShopping")
-            .Options;
+    .UseInMemoryDatabase("onlineShopping")
+    .Options;
 
         private ApplicationDbContext _context;
         private IConfiguration _config;
@@ -42,6 +42,12 @@ namespace OnlineShopping.Tests.AuthControllerTests
             _config = getConfig();
             controller = new AuthenticationController(_context, _config);
 
+        }
+
+        [TearDown]
+        public void Clear()
+        {
+            _context.Database.EnsureDeleted();
         }
 
         private void SeedDatabase()

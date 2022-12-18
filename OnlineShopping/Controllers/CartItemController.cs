@@ -30,9 +30,15 @@ namespace OnlineShopping.Controllers
         /// <param name="payload"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> AddCartItem([FromBody] CartPayload payload)
+        public async Task<ActionResult> AddCartItem([FromBody] CartPayload payload)
         {
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
+
+            if(!_context.Users.Any(u=>u.Id == userId))
+            {
+                cartResponse.Message = "Unknown user. Cannot have access to add item to cart";
+                return BadRequest(cartResponse);
+            }
 
             if (!CartExists(userId))
             {

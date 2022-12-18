@@ -22,7 +22,6 @@ namespace OnlineShopping.Tests
             .Options;
 
         private ApplicationDbContext _context;
-        private IConfiguration _config;
 
         private UsersController controller;
 
@@ -48,7 +47,12 @@ namespace OnlineShopping.Tests
             _context = new ApplicationDbContext(options);
             SeedDatabase();
             controller = new UsersController(_context);
+        }
 
+        [TearDown]
+        public void Clear()
+        {
+            _context.Database.EnsureDeleted();
         }
 
         private void SeedDatabase()
@@ -57,7 +61,7 @@ namespace OnlineShopping.Tests
 
             if (!_context.Users.Any())
             {
-                _context.AddRange(users);
+                _context.Users.AddRange(users);
                 _context.SaveChanges();
             }
         }

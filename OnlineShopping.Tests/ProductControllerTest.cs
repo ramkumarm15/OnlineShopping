@@ -40,13 +40,19 @@ namespace OnlineShopping.Tests
         };
 
 
-        [OneTimeSetUp]
+        [SetUp]
         public void Setup()
         {
             _context = new ApplicationDbContext(options);
             SeedDatabase();
             controller = new ProductController(_context);
 
+        }
+
+        [TearDown]
+        public void Clear()
+        {
+            _context.Database.EnsureDeleted();
         }
 
         private void SeedDatabase()

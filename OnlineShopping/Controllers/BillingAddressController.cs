@@ -33,21 +33,18 @@ namespace OnlineShopping.Controllers
         [HttpGet]
         public async Task<ActionResult> GetBillingAddresses()
         {
-
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
 
-
-            List<BillingAddress> billingAddress = await _context.BillingAddresses
-                .Where(x => x.User.Id == userId)
-                .ToListAsync();
-            if (billingAddress == null)
+            if (_context.BillingAddresses.Any(e => e.User.Id == userId))
             {
-                response.Message = "No address found";
-                return BadRequest(response);
+                List<BillingAddress> billingAddress = await _context.BillingAddresses
+                    .Where(x => x.User.Id == userId)
+                    .ToListAsync();
+
+                return Ok(billingAddress);
             }
-
-            return Ok(billingAddress);
-
+            response.Message = "No address found";
+            return BadRequest(response);
         }
 
         /// <summary>
@@ -58,16 +55,12 @@ namespace OnlineShopping.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult> GetBillingAddress([FromRoute] int id)
         {
-            if (BillingAddressExists(id))
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
+            if (BillingAddressExists(id, userId))
             {
-
-                int userId = Convert.ToInt32(User.FindFirstValue("id"));
-
-
                 BillingAddress? billingAddress = await _context.BillingAddresses
                     .Where(x => x.Id == id && x.User.Id == userId)
                     .FirstOrDefaultAsync();
-
 
                 return Ok(billingAddress);
 
@@ -87,12 +80,10 @@ namespace OnlineShopping.Controllers
         public async Task<ActionResult> PutBillingAddress([FromRoute] int id,
             [FromBody] BillingAddressDto billingAddress)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
 
-            if (BillingAddressExists(id))
+            if (BillingAddressExists(id, userId))
             {
-                int userId = Convert.ToInt32(User.FindFirstValue("id"));
-
-
                 BillingAddress? billingAddressToBeUpdated = await _context.BillingAddresses
                     .Where(w => w.Id == id && w.User.Id == userId).FirstOrDefaultAsync();
 
@@ -112,7 +103,7 @@ namespace OnlineShopping.Controllers
                 return Ok(response);
             }
 
-            response.Message = "Address not found";
+            response.Message = "No address found";
             return BadRequest(response);
         }
 
@@ -124,12 +115,14 @@ namespace OnlineShopping.Controllers
         [HttpPost]
         public async Task<ActionResult> PostBillingAddress([FromBody] BillingAddressDto billingAddress)
         {
-
+            if (billingAddress == null)
+            {
+                response.Message = "Data empty";
+                return BadRequest(response);
+            }
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
 
-
             User? userToAddBillingAddress = await _context.Users.FindAsync(userId);
-
 
             BillingAddress? billingAddressToBeAdded = new BillingAddress
             {
@@ -143,13 +136,11 @@ namespace OnlineShopping.Controllers
                 User = userToAddBillingAddress
             };
 
-
             _context.BillingAddresses.Add(billingAddressToBeAdded);
             await _context.SaveChangesAsync();
 
             response.Message = "Address added";
             return Ok(response);
-
         }
 
 
@@ -161,11 +152,10 @@ namespace OnlineShopping.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteBillingAddress([FromRoute] int id)
         {
-            if (BillingAddressExists(id))
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
+
+            if (BillingAddressExists(id, userId))
             {
-                int userId = Convert.ToInt32(User.FindFirstValue("id"));
-
-
                 BillingAddress? billingAddressToBeDeleted = await _context.BillingAddresses
                     .Where(w => w.Id == id && w.User.Id == userId).FirstOrDefaultAsync();
 
@@ -181,9 +171,9 @@ namespace OnlineShopping.Controllers
             return BadRequest(response);
         }
 
-        private bool BillingAddressExists(int id)
+        private bool BillingAddressExists(int id, int userId)
         {
-            return _context.BillingAddresses.Any(e => e.Id == id);
+            return _context.BillingAddresses.Any(e => e.Id == id && e.User.Id == userId);
         }
     }
 }
