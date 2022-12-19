@@ -31,6 +31,12 @@ namespace OnlineShopping.Controllers
         {
             var userId = Convert.ToInt32(User.FindFirstValue("id"));
 
+            if(!_context.Users.Any(u=>u.Id == userId))
+            {
+                errorResponse.Message = "User not found";
+                return BadRequest(errorResponse);
+            }
+
             var cart = await _context.Carts.Where(x => x.User.Id == userId)
                 .Include(i => i.CartItemsList)
                 .FirstOrDefaultAsync();
