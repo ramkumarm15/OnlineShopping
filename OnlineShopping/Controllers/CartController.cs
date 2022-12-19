@@ -27,13 +27,20 @@ namespace OnlineShopping.Controllers
         /// <param name="cartId"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetCart()
+        public async Task<ActionResult> GetCart()
         {
             var userId = Convert.ToInt32(User.FindFirstValue("id"));
+
+            if(!_context.Users.Any(u=>u.Id == userId))
+            {
+                errorResponse.Message = "User not found";
+                return BadRequest(errorResponse);
+            }
 
             var cart = await _context.Carts.Where(x => x.User.Id == userId)
                 .Include(i => i.CartItemsList)
                 .FirstOrDefaultAsync();
+
             if (cart == null)
             {
                 User? userToCreateCart = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
@@ -47,9 +54,8 @@ namespace OnlineShopping.Controllers
 
                 _context.Carts.Add(cartForUser);
                 await _context.SaveChangesAsync();
-                //return Ok(cartForUser);
-                cart = cartForUser;
 
+                cart = cartForUser;
             }
 
             // Retrieve all cart items of this cart
@@ -65,7 +71,7 @@ namespace OnlineShopping.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CreateCart()
+        public async Task<ActionResult> CreateCart()
         {
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
 

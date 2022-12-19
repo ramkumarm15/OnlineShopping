@@ -18,11 +18,12 @@ namespace OnlineShopping.Controllers
     public class BillingAddressController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
+        private BillingAddressResponse response;
 
         public BillingAddressController(ApplicationDbContext context)
         {
             _context = context;
+            response = new BillingAddressResponse();
         }
 
         /// <summary>
@@ -30,22 +31,20 @@ namespace OnlineShopping.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BillingAddress>>> GetBillingAddresses()
+        public async Task<ActionResult> GetBillingAddresses()
         {
-
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
 
-
-            List<BillingAddress> billingAddress = await _context.BillingAddresses
-                .Where(x => x.User.Id == userId)
-                .ToListAsync();
-            if (billingAddress == null)
+            if (_context.BillingAddresses.Any(e => e.User.Id == userId))
             {
-                return BadRequest(new { message = "No address found" });
+                List<BillingAddress> billingAddress = await _context.BillingAddresses
+                    .Where(x => x.User.Id == userId)
+                    .ToListAsync();
+
+                return Ok(billingAddress);
             }
-
-            return Ok(new { data = billingAddress });
-
+            response.Message = "No address found";
+            return BadRequest(response);
         }
 
         /// <summary>
@@ -54,23 +53,20 @@ namespace OnlineShopping.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<BillingAddress>> GetBillingAddress([FromRoute] int id)
+        public async Task<ActionResult> GetBillingAddress([FromRoute] int id)
         {
-            if (BillingAddressExists(id))
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
+            if (BillingAddressExists(id, userId))
             {
-
-                int userId = Convert.ToInt32(User.FindFirstValue("id"));
-
-
                 BillingAddress? billingAddress = await _context.BillingAddresses
                     .Where(x => x.Id == id && x.User.Id == userId)
                     .FirstOrDefaultAsync();
 
-
-                return Ok(new { data = billingAddress });
+                return Ok(billingAddress);
 
             }
-            return BadRequest(new { message = "Address not found" });
+            response.Message = "No address found";
+            return BadRequest(response);
         }
 
 
@@ -81,15 +77,13 @@ namespace OnlineShopping.Controllers
         /// <param name="billingAddress"></param>
         /// <returns></returns>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> PutBillingAddress([FromRoute] int id,
+        public async Task<ActionResult> PutBillingAddress([FromRoute] int id,
             [FromBody] BillingAddressDto billingAddress)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
 
-            if (BillingAddressExists(id))
+            if (BillingAddressExists(id, userId))
             {
-                int userId = Convert.ToInt32(User.FindFirstValue("id"));
-
-
                 BillingAddress? billingAddressToBeUpdated = await _context.BillingAddresses
                     .Where(w => w.Id == id && w.User.Id == userId).FirstOrDefaultAsync();
 
@@ -104,9 +98,13 @@ namespace OnlineShopping.Controllers
 
                 _context.BillingAddresses.Update(billingAddressToBeUpdated);
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "Address updated" });
+
+                response.Message = "Address updated";
+                return Ok(response);
             }
-            return BadRequest(new { message = "Cannot find the address" });
+
+            response.Message = "No address found";
+            return BadRequest(response);
         }
 
         /// <summary>
@@ -115,14 +113,16 @@ namespace OnlineShopping.Controllers
         /// <param name="billingAddress"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<BillingAddress>> PostBillingAddress([FromBody] BillingAddressDto billingAddress)
+        public async Task<ActionResult> PostBillingAddress([FromBody] BillingAddressDto billingAddress)
         {
-
+            if (billingAddress == null)
+            {
+                response.Message = "Data empty";
+                return BadRequest(response);
+            }
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
 
-
             User? userToAddBillingAddress = await _context.Users.FindAsync(userId);
-
 
             BillingAddress? billingAddressToBeAdded = new BillingAddress
             {
@@ -136,13 +136,11 @@ namespace OnlineShopping.Controllers
                 User = userToAddBillingAddress
             };
 
-
             _context.BillingAddresses.Add(billingAddressToBeAdded);
             await _context.SaveChangesAsync();
 
-
-            return Ok(new { message = "Address Added Successfully" });
-
+            response.Message = "Address added";
+            return Ok(response);
         }
 
 
@@ -152,29 +150,30 @@ namespace OnlineShopping.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteBillingAddress([FromRoute] int id)
+        public async Task<ActionResult> DeleteBillingAddress([FromRoute] int id)
         {
-            if (BillingAddressExists(id))
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
+
+            if (BillingAddressExists(id, userId))
             {
-                int userId = Convert.ToInt32(User.FindFirstValue("id"));
-
-
                 BillingAddress? billingAddressToBeDeleted = await _context.BillingAddresses
                     .Where(w => w.Id == id && w.User.Id == userId).FirstOrDefaultAsync();
 
 
                 _context.BillingAddresses.Remove(billingAddressToBeDeleted);
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "Deleted successfully" });
+
+                response.Message = "Address deleted";
+                return Ok(response);
             }
 
-            return BadRequest(new { message = "Address not found" });
+            response.Message = "Address not found";
+            return BadRequest(response);
         }
 
-
-        private bool BillingAddressExists(int id)
+        private bool BillingAddressExists(int id, int userId)
         {
-            return _context.BillingAddresses.Any(e => e.Id == id);
+            return _context.BillingAddresses.Any(e => e.Id == id && e.User.Id == userId);
         }
     }
 }

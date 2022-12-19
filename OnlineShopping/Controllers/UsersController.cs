@@ -32,7 +32,7 @@ namespace OnlineShopping.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMe()
         {
-            int userId = Convert.ToInt32(User.FindFirstValue("id"));
+            int userId = Convert.ToInt32(User.FindFirstValue("Id"));
             if (UserExists(userId))
             {
                 User? user = await _context.Users.Where(x => x.Id == userId)
@@ -54,45 +54,44 @@ namespace OnlineShopping.Controllers
         [HttpPost]
         public async Task<IActionResult> PostUser([FromBody] UserDto? user)
         {
-            if (!user.Equals(null))
+            if (user == null)
             {
-                if (UserExistsByUsername(user.Username))
-                {
-                    errorResponse.Message = "Username already exists";
-                    return BadRequest(errorResponse);
-                }
-
-                User userMappingFromDto = new User
-                {
-                    Username = user.Username,
-                    Password = user.Password,
-                    Name = user.Name,
-                    EmailAddress = user.EmailAddress,
-                    About = user.About,
-                    City = user.City,
-                    Role = Roles.User.GetDisplayName()
-                };
-
-                Cart cartForUser = new Cart()
-                {
-                    TotalPrice = 0,
-                    Created = DateTime.Now,
-                    Updated = DateTime.Now,
-                    User = userMappingFromDto
-                };
-
-                _context.Users.Add(userMappingFromDto);
-                _context.Carts.Add(cartForUser);
-                await _context.SaveChangesAsync();
-
-                response.User = userMappingFromDto;
-                response.Message = "Profile created successfully";
-                return Ok(response);
+                errorResponse.Message = "Data empty";
+                return BadRequest(errorResponse);
 
             }
+            if (UserExistsByUsername(user.Username))
+            {
+                errorResponse.Message = "Username already exists";
+                return BadRequest(errorResponse);
+            }
 
-            errorResponse.Message = "Data empty";
-            return BadRequest(errorResponse);
+            User userMappingFromDto = new User
+            {
+                Username = user.Username,
+                Password = user.Password,
+                Name = user.Name,
+                EmailAddress = user.EmailAddress,
+                About = user.About,
+                City = user.City,
+                Role = Roles.User.GetDisplayName()
+            };
+
+            Cart cartForUser = new Cart()
+            {
+                TotalPrice = 0,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                User = userMappingFromDto
+            };
+
+            _context.Users.Add(userMappingFromDto);
+            _context.Carts.Add(cartForUser);
+            await _context.SaveChangesAsync();
+
+            response.User = userMappingFromDto;
+            response.Message = "Profile created successfully";
+            return Ok(response);
         }
 
         /// <summary>
@@ -140,7 +139,7 @@ namespace OnlineShopping.Controllers
             int userId = Convert.ToInt32(User.FindFirstValue("id"));
             if (!UserExists(userId))
             {
-                errorResponse.Message = "User not found";
+                errorResponse.Message = "No user found";
                 return BadRequest(errorResponse);
             }
 
@@ -189,7 +188,7 @@ namespace OnlineShopping.Controllers
                 response.Message = "Deleted user";
                 return Ok(response);
             }
-            errorResponse.Message = "User not found";
+            errorResponse.Message = "No user found";
             return BadRequest(errorResponse);
         }
 
