@@ -24,7 +24,7 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo()
     {
         Version = "v1",
-        Title = "Online Shopping API"
+        Title = "Thrift Shop API"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
