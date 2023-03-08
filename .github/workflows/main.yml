@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore ./MentorTask.sln
       
     - name: Build
-      run: dotnet build ./Mentortask.sln --configuration Release --no-restore
+      run: dotnet build ./MentorTask.sln --configuration Release --no-restore
     
     - name: Publish
-      run: dotnet publish ./Mentortask.sln --configuration Release --no-build
+      run: dotnet publish ./MentorTask.sln --configuration Release --no-build
