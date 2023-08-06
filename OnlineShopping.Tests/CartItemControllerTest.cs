@@ -28,7 +28,7 @@ namespace OnlineShopping.Tests
 
         private CartItemController controller;
 
-        private ClaimsPrincipal ValidUser, InValidUser;
+        private ClaimsPrincipal ValidUser, InValidUser, ValidUserWithCartDoestNotExists;
 
         [SetUp]
         public void Setup()
@@ -43,6 +43,14 @@ namespace OnlineShopping.Tests
                                         new Claim(ClaimTypes.GivenName, "Ramkumar"),
                                         new Claim(ClaimTypes.Role, "Admin")
                                    }, "TestAuthentication"));
+
+            ValidUserWithCartDoestNotExists = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                                        new Claim("Id", "2"),
+                                        new Claim(ClaimTypes.Name, "ramkumar"),
+                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
+                                        new Claim(ClaimTypes.Role, "Admin")
+                                   }, "TestAuthentication"));
+
             InValidUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
                                         new Claim("Id", "12"),
                                         new Claim(ClaimTypes.Name, "ramkumar"),
@@ -95,6 +103,7 @@ namespace OnlineShopping.Tests
             if (!_context.Carts.Any())
             {
                 var user = _context.Users.FirstOrDefault(u => u.Id == 1);
+                var user2 = _context.Users.FirstOrDefault(u => u.Id == 2);
 
                 List<Cart> cart = new List<Cart>
                 {
@@ -105,6 +114,14 @@ namespace OnlineShopping.Tests
                         Created = DateTime.Now,
                         Updated = DateTime.Now,
                         User = user
+                    },
+                    new Cart
+                    {
+                        CartId = 2,
+                        TotalPrice = 0,
+                        Created = DateTime.Now,
+                        Updated = DateTime.Now,
+                        User = user2
                     }
                 };
 
@@ -114,7 +131,7 @@ namespace OnlineShopping.Tests
         }
 
         [Test]
-        public async Task AddToCartInvalidUserIdReturnsBadRequest()
+        public async Task AddToCartInvalidUserReturnsBadRequest()
         {
             //Arrange
             controller.ControllerContext = new ControllerContext
@@ -131,7 +148,142 @@ namespace OnlineShopping.Tests
             };
 
             //Act
-            var result = await controller.AddCartItem(payload);
+            var result = await controller.AddCartItem(payload) as ObjectResult;
+            var response = result.Value as CartResponse;
+
+            //Assert
+            Assert.That(result.StatusCode, Is.EqualTo(400));
+            Assert.That(response.Message, Is.EqualTo("Unknown user. Cannot have access to add item to cart"));
+        }
+
+        [Test]
+        public async Task AddToCartValidUserWithCartExistsReturnsOkRequest()
+        {
+            //Arrange
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = ValidUser }
+            };
+            var payload = new CartPayload
+            {
+                Operation = CartOperation.Add,
+                Data = new CartItemDto
+                {
+                    productId = 1,
+                }
+            };
+
+            var cart = await _context.Carts.FirstOrDefaultAsync(f => f.User.Id == 1);
+
+            var cartRepoResponse = new CartResponse
+            {
+                Message = "Product added"
+            };
+            repository.Setup(s => s.Add(cart, payload.Data)).ReturnsAsync(cartRepoResponse);
+
+            //Act
+            var result = await controller.AddCartItem(payload) as ObjectResult;
+            var response = result.Value as CartResponse;
+
+            //Assert
+            Assert.That(result.StatusCode, Is.EqualTo(200));
+            Assert.That(response.Message, Is.EqualTo("Product added"));
+        }
+
+        [Test]
+        public async Task UpdateCartItemValidUserReturnsOkRequest()
+        {
+            //Arrange
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = ValidUser }
+            };
+            var payload = new CartPayload
+            {
+                Operation = CartOperation.Update,
+                Data = new CartItemDto
+                {
+                    productId = 1,
+                }
+            };
+
+            var cart = await _context.Carts.FirstOrDefaultAsync(f => f.User.Id == 1);
+
+            var cartRepoResponse = new CartResponse
+            {
+                Message = "Product updated"
+            };
+            repository.Setup(s => s.Update(cart, payload.Data)).ReturnsAsync(cartRepoResponse);
+
+            //Act
+            var result = await controller.AddCartItem(payload) as ObjectResult;
+            var response = result.Value as CartResponse;
+
+            //Assert
+            Assert.That(result.StatusCode, Is.EqualTo(200));
+            Assert.That(response.Message, Is.EqualTo("Product updated"));
+        }
+
+        [Test]
+        public async Task DeleteCartItemValidUserReturnsOkRequest()
+        {
+            //Arrange
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = ValidUser }
+            };
+            var payload = new CartPayload
+            {
+                Operation = CartOperation.Delete,
+                Data = new CartItemDto
+                {
+                    productId = 1,
+                }
+            };
+
+            var cart = await _context.Carts.FirstOrDefaultAsync(f => f.User.Id == 1);
+
+            var cartRepoResponse = new CartResponse
+            {
+                Message = "Product deleted"
+            };
+            repository.Setup(s => s.Remove(cart, payload.Data)).ReturnsAsync(cartRepoResponse);
+
+            //Act
+            var result = await controller.AddCartItem(payload) as ObjectResult;
+            var response = result.Value as CartResponse;
+
+            //Assert
+            Assert.That(result.StatusCode, Is.EqualTo(200));
+            Assert.That(response.Message, Is.EqualTo("Product deleted"));
+        }
+
+        [Test]
+        public async Task UnknownCartOperationCartItemValidUserReturnsBadRequest()
+        {
+            //Arrange
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = ValidUser }
+            };
+            var payload = new CartPayload
+            {
+                Operation = "",
+                Data = new CartItemDto
+                {
+                    productId = 1,
+                }
+            };
+
+            var cart = await _context.Carts.FirstOrDefaultAsync(f => f.User.Id == 1);
+
+            //Act
+            var result = await controller.AddCartItem(payload) as ObjectResult;
+            var response = result.Value as CartResponse;
+
+            //Assert
+            Assert.That(result.StatusCode, Is.EqualTo(400));
+            Assert.That(response.Message, Is.EqualTo("Cannot add product right now"));
         }
     }
 }

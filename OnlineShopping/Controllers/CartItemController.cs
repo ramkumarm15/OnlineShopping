@@ -40,23 +40,9 @@ namespace OnlineShopping.Controllers
                 return BadRequest(cartResponse);
             }
 
-            if (!CartExists(userId))
-            {
-                User? userToCreateCart = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-                Cart cartForUser = new Cart()
-                {
-                    TotalPrice = 0,
-                    Created = DateTime.Now,
-                    Updated = DateTime.Now,
-                    User = userToCreateCart
-                };
-
-                _context.Carts.Add(cartForUser);
-                await _context.SaveChangesAsync();
-            }
-
             Cart? cartOfUser = await _context.Carts
-                    .Where(c => c.UserId == userId).FirstOrDefaultAsync();
+                    .Where(c => c.User.Id == userId).FirstOrDefaultAsync();
+
 
             if (payload.Operation.Equals(CartOperation.Add.ToLower()))
             {
@@ -78,11 +64,6 @@ namespace OnlineShopping.Controllers
             }
             cartResponse.Message = "Cannot add product right now";
             return BadRequest(cartResponse);
-        }
-
-        private bool CartExists(int userId)
-        {
-            return _context.Carts.Any(x => x.User.Id == userId);
         }
     }
 }

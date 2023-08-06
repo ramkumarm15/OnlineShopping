@@ -10,17 +10,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OnlineShopping.Tests.Data;
 
 namespace OnlineShopping.Tests
 {
     public class AuthenticationControllerTest
     {
-        private DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
-    .UseInMemoryDatabase("onlineShopping")
-    .Options;
+        private DbContextOptions<ApplicationDbContext> options 
+            = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase("onlineShopping")
+                .Options;
 
-        private ApplicationDbContext _context;
-        private IConfiguration _config;
+        private ApplicationDbContext contextMock;
+        private IConfiguration configuration;
 
         private AuthenticationController controller;
 
@@ -28,7 +30,7 @@ namespace OnlineShopping.Tests
         public static IConfiguration getConfig()
         {
             var config = new ConfigurationBuilder()
-              .SetBasePath("D:\\Angular\\MentorTask\\OnlineShopping\\")
+              .SetBasePath("C:\\Users\\2107082\\source\\repos\\OnlineShopping\\OnlineShopping\\")
               .AddJsonFile("appsettings.json")
               .Build();
             return config;
@@ -37,24 +39,24 @@ namespace OnlineShopping.Tests
         [SetUp]
         public void Setup()
         {
-            _context = new ApplicationDbContext(options);
+            contextMock = new ApplicationDbContext(options);
             SeedDatabase();
-            _config = getConfig();
-            controller = new AuthenticationController(_context, _config);
+            configuration = getConfig();
+            controller = new AuthenticationController(contextMock, configuration);
 
         }
 
         [TearDown]
         public void Clear()
         {
-            _context.Database.EnsureDeleted();
+            contextMock.Database.EnsureDeleted();
         }
 
         private void SeedDatabase()
         {
-            _context.Database.EnsureCreated();
+            contextMock.Database.EnsureCreated();
 
-            if (!_context.Users.Any())
+            if (!contextMock.Users.Any())
             {
                 List<User> users = new List<User>
                 {
@@ -71,24 +73,25 @@ namespace OnlineShopping.Tests
                     },
                 };
 
-                _context.AddRange(users);
-                _context.SaveChanges();
+                contextMock.AddRange(users);
+                contextMock.SaveChanges();
             }
         }
 
         [Test]
         public async Task InputUsernameAndPasswordIsNullReturnsBadRequest()
         {
-            // Assign
-            var input = new Login();
-            input.Username = null;
-            input.Password = null;
-
             // Arrange
-            var response = await controller.Token(input);
+            var loginData = Helper.GetLoginDetails();
+            loginData.Username = null;
+            loginData.Password = null;
+
+            // Act
+            var response = await controller.Token(loginData);
             var result = response as ObjectResult;
             var message = result.Value as ErrorResponse;
 
+            // Assert
             Assert.That(result?.StatusCode, Is.EqualTo(400));
             Assert.That(typeof(ErrorResponse), Is.EqualTo(result.Value.GetType()));
             Assert.AreEqual(message.Message, "Username and Password is empty");
@@ -97,16 +100,17 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task InValidInputUsernameAndPasswordReturnsBadRequest()
         {
-            // Assign
-            var input = new Login();
-            input.Username = "Arun";
-            input.Password = "Ramkumar";
-
             // Arrange
-            var response = await controller.Token(input);
+            var loginData = Helper.GetLoginDetails();
+            loginData.Username = "Arun";
+            loginData.Password = "Ramkumar";
+
+            // Act
+            var response = await controller.Token(loginData);
             var result = response as ObjectResult;
             var message = result.Value as ErrorResponse;
 
+            // Assert
             Assert.That(result?.StatusCode, Is.EqualTo(400));
             Assert.AreEqual(message.Message, "Username and Password is incorrect. Try again");
         }
@@ -114,16 +118,14 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task ValidInputUsernameAndPasswordReturnsOkResultAndAccessToken()
         {
-            // Assign
-            var loginData = new Login();
-            loginData.Username = "ramkumar";
-            loginData.Password = "Ramkumar@45";
-
             // Arrange
+            var loginData = Helper.GetLoginDetails();
+
+            // Act
             var result = await controller.Token(loginData) as ObjectResult;
             var response = result.Value as AuthenticationResponse;
 
-            // Act
+            // Assert
             Assert.That(result?.StatusCode, Is.EqualTo(200));
             Assert.That(result.Value.GetType(), Is.EqualTo(typeof(AuthenticationResponse)));
         }

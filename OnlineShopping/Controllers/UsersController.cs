@@ -38,6 +38,9 @@ namespace OnlineShopping.Controllers
                 User? user = await _context.Users.Where(x => x.Id == userId)
                     .FirstOrDefaultAsync();
 
+                user.BillingAddresses = await _context.BillingAddresses.Where(b => b.User.Id == user.Id && b.Default)
+                    .ToListAsync();
+
                 return Ok(user);
             }
 
@@ -117,6 +120,9 @@ namespace OnlineShopping.Controllers
             userToBeUpdated.EmailAddress = user.EmailAddress;
             userToBeUpdated.About = user.About;
             userToBeUpdated.City = user.City;
+            userToBeUpdated.Age = user.Age;
+            userToBeUpdated.MobileNumber = user.MobileNumber;
+            userToBeUpdated.Gender = user.Gender;
 
             _context.Update(userToBeUpdated);
             await _context.SaveChangesAsync();

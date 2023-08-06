@@ -87,6 +87,19 @@ namespace OnlineShopping.Controllers
                 BillingAddress? billingAddressToBeUpdated = await _context.BillingAddresses
                     .Where(w => w.Id == id && w.User.Id == userId).FirstOrDefaultAsync();
 
+                if (billingAddress.defaultAddress)
+                {
+                    var addressToRemoveDefault = await _context.BillingAddresses
+                        .Where(w => w.Default && w.User.Id == userId).FirstOrDefaultAsync();
+
+                    if (addressToRemoveDefault != null)
+                    {
+                        addressToRemoveDefault.Default = false;
+
+                        _context.BillingAddresses.Update(addressToRemoveDefault);
+                    }
+                }
+
                 billingAddressToBeUpdated.BillingName = billingAddress.BillingName;
                 billingAddressToBeUpdated.Address1 = billingAddress.Address1;
                 billingAddressToBeUpdated.Address2 = billingAddress.Address2;
@@ -94,6 +107,7 @@ namespace OnlineShopping.Controllers
                 billingAddressToBeUpdated.City = billingAddress.City;
                 billingAddressToBeUpdated.State = billingAddress.State;
                 billingAddressToBeUpdated.PostalCode = billingAddress.PostalCode;
+                billingAddressToBeUpdated.Default = billingAddress.defaultAddress;
 
 
                 _context.BillingAddresses.Update(billingAddressToBeUpdated);
@@ -124,6 +138,19 @@ namespace OnlineShopping.Controllers
 
             User? userToAddBillingAddress = await _context.Users.FindAsync(userId);
 
+            if (billingAddress.defaultAddress)
+            {
+                var addressToRemoveDefault = await _context.BillingAddresses
+                    .Where(w => w.Default && w.User.Id == userId).FirstOrDefaultAsync();
+
+                if(addressToRemoveDefault != null)
+                {
+                    addressToRemoveDefault.Default = false;
+
+                    _context.BillingAddresses.Update(addressToRemoveDefault);
+                }
+            }
+
             BillingAddress? billingAddressToBeAdded = new BillingAddress
             {
                 BillingName = billingAddress.BillingName,
@@ -133,6 +160,7 @@ namespace OnlineShopping.Controllers
                 State = billingAddress.State,
                 PostalCode = billingAddress.PostalCode,
                 MobileNumber = billingAddress.MobileNumber,
+                Default = billingAddress.defaultAddress,
                 User = userToAddBillingAddress
             };
 
@@ -164,6 +192,35 @@ namespace OnlineShopping.Controllers
                 await _context.SaveChangesAsync();
 
                 response.Message = "Address deleted";
+                return Ok(response);
+            }
+
+            response.Message = "Address not found";
+            return BadRequest(response);
+        }
+
+        [HttpPost]
+        [Route("address/set-default")]
+        public async Task<ActionResult> SetDefaultAddress([FromBody] DefaultAddressDto addressDto)
+        {
+            int userId = Convert.ToInt32(User.FindFirstValue("id"));
+
+            if (BillingAddressExists(addressDto.AddressId, userId))
+            {
+                BillingAddress? AddressToSetDefault = await _context.BillingAddresses
+                    .Where(w => w.Id == addressDto.AddressId && w.User.Id == userId).FirstOrDefaultAsync();
+
+                BillingAddress? AddressToRemoveDefault = await _context.BillingAddresses
+                    .Where(w => w.Default && w.User.Id == userId).FirstOrDefaultAsync();
+
+                AddressToRemoveDefault.Default = false;
+                AddressToSetDefault.Default = true;
+
+                _context.BillingAddresses.Update(AddressToSetDefault);
+                _context.BillingAddresses.Update(AddressToRemoveDefault);
+                await _context.SaveChangesAsync();
+
+                response.Message = "Default address changed";
                 return Ok(response);
             }
 

@@ -14,8 +14,13 @@ namespace OnlineShopping.Models.DTO
         [Required] public string State { get; set; }
         [Required] public int PostalCode { get; set; }
         [Required] public double MobileNumber { get; set; }
+        [Required] public bool defaultAddress { get; set; }
     }
 
+    public class DefaultAddressDto
+    {
+        public int AddressId { get; set;}
+    }
     public class BillingAddressResponse
     {
         public string Message { get; set; }

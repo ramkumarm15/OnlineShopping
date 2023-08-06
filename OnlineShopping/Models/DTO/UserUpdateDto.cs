@@ -10,5 +10,11 @@ namespace OnlineShopping.Models.DTO
         public string EmailAddress { get; set; }
         [Required] [MaxLength(200)] public string About { get; set; }
         [Required] public string City { get; set; }
+
+        [Required]
+        [EnumDataType(typeof(Gender))]
+        public string Gender { get; set; }
+        [Required] public int Age { get; set; }
+        [Required] public double MobileNumber { get; set; }
     }
 }

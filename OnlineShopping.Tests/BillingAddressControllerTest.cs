@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using OnlineShopping.Controllers;
-using OnlineShopping.Models;
-using OnlineShopping.Models.DTO;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
+using OnlineShopping.Controllers;
+using OnlineShopping.Models;
+using OnlineShopping.Models.DTO;
+using OnlineShopping.Tests.Data;
+
 
 namespace OnlineShopping.Tests
 {
@@ -19,13 +19,9 @@ namespace OnlineShopping.Tests
         private DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase("onlineShopping")
             .Options;
-
         private ApplicationDbContext _context;
-
         private BillingAddressController controller;
-
         private List<BillingAddress> addresses;
-
         private List<User> users;
 
         [SetUp]
@@ -92,12 +88,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task GetListOfAddressWithInvalidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -113,12 +104,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task GetListOfAddressWithValidUserReturnsOkRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -133,12 +119,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task GetAddressWithInValidAddressIdInvalidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -155,12 +136,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task GetAddressWithValidAddressIdInvalidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -177,12 +153,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task GetAddressWithInValidAddressIdValidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -199,12 +170,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task GetAddressWithValidAddressIdValidUserReturnsOkRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -220,12 +186,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task UpdateAddressWithInValidAddressIdInvalidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -252,17 +213,13 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task UpdateAddressWithInValidAddressIdValidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
             };
             int billingAddressId = 2;
+
             BillingAddressDto updatedAddress = new BillingAddressDto
             {
                 BillingName = "Ramkumar",
@@ -284,12 +241,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task UpdateAddressWithValidAddressIdInValidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "2"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -316,12 +268,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task UpdateAddressWithValidAddressIdValidUserReturnsOkRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -348,12 +295,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task CreateAddressInvalidUserReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -370,12 +312,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task CreateAddressValidUserIdReturnsOkRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -401,12 +338,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task DeleteAddressWithInValidAddressIdInvalidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -423,12 +355,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task DeleteAddressWithInValidAddressIdValidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -445,12 +372,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task DeleteAddressWithValidAddressIdInValidUserIdReturnsBadRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "6"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -467,12 +389,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task DeleteAddressWithValidAddressIdValidUserIdReturnsOkRequest()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }

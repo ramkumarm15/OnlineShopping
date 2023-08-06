@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
 namespace OnlineShopping.Logger
@@ -6,6 +7,7 @@ namespace OnlineShopping.Logger
     /// <summary>
     /// Log data to file
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class Log
     {
         private const string SourceFolderName = "logs";

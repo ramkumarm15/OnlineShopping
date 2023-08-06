@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using OnlineShopping.Controllers;
 using OnlineShopping.Models;
 using OnlineShopping.Models.DTO;
+using OnlineShopping.Tests.Data;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -70,12 +70,7 @@ namespace OnlineShopping.Tests
         public async Task AuthenticatedUserDataAccessReturnOkRequestAndUserData()
         {
             //Arrange
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim("Id", "1"),
-                                        new Claim(ClaimTypes.Name, "ramkumar"),
-                                        new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                                        new Claim(ClaimTypes.Role, "Admin")
-                                   }, "TestAuthentication"));
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -92,16 +87,7 @@ namespace OnlineShopping.Tests
         public async Task InvalidUserAccessGetMeReturnBadRequestAndErrorMessage()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "32"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -129,15 +115,9 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task PostUserUserDataWithExistingUsernameReturnsBadRequest()
         {
-            UserDto? newUser = new UserDto
-            {
-                Name = "Ramkumar",
-                EmailAddress = "ramkumarmani2000@gmail.com",
-                About = "Full stack developer",
-                City = "Tuty",
-                Username = "ramkumar",
-                Password = "Ramkumar@45",
-            };
+            UserDto? newUser = Helper.GetNewUser();
+
+            newUser.Username = "ramkumar";
 
             var result = await controller.PostUser(newUser) as ObjectResult;
             var errorMessage = result.Value as ErrorResponse;
@@ -149,15 +129,7 @@ namespace OnlineShopping.Tests
         [Test]
         public async Task PostUserValidUserDataReturnsOkRequest()
         {
-            UserDto? newUser = new UserDto
-            {
-                Name = "Jayarath",
-                EmailAddress = "jayarath@gmail.com",
-                About = "Full stack developer",
-                City = "Chennai",
-                Username = "jayarath",
-                Password = "Ramkumar@45",
-            };
+            UserDto? newUser = Helper.GetNewUser();
 
             var result = await controller.PostUser(newUser) as ObjectResult;
             var response = result.Value as UserResponse;
@@ -170,16 +142,7 @@ namespace OnlineShopping.Tests
         public async Task UpdateUserDetailsWithInvalidAuthenticatedUserReturnBadRequestAndErrorMessage()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "32"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -204,16 +167,8 @@ namespace OnlineShopping.Tests
         public async Task UpdateUserDetailsWithValidAuthenticatedUserReturnBadRequestAndErrorMessage()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "1"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetValidUser();
+
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -238,16 +193,7 @@ namespace OnlineShopping.Tests
         public async Task UpdateUserPasswordWithInvalidAuthenticatedUserReturnBadRequestAndErrorMessage()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "32"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -271,16 +217,7 @@ namespace OnlineShopping.Tests
         public async Task UpdatePasswordWithValidAuthenticatedUserButNewPasswordIsNotCorrectReturnBadRequestAndErrorMessage()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "1"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -304,16 +241,7 @@ namespace OnlineShopping.Tests
         public async Task UpdatePasswordWithValidAuthenticatedUserButOldPasswordIsNotCorrectReturnBadRequestAndErrorMessage()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "1"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -337,16 +265,7 @@ namespace OnlineShopping.Tests
         public async Task UpdatePasswordWithValidAuthenticatedUserWithValidDataReturnOkRequest()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "1"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -370,16 +289,7 @@ namespace OnlineShopping.Tests
         public async Task DeleteUserWithValidAuthenticatedUserReturnOkRequest()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "1"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -396,16 +306,7 @@ namespace OnlineShopping.Tests
         public async Task DeleteUserWithInValidAuthenticatedUserReturnBadRequest()
         {
             //Arrange
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                        new Claim[] {
-                            new Claim("Id", "2"),
-                            new Claim(ClaimTypes.Name, "ramkumar"),
-                            new Claim(ClaimTypes.GivenName, "Ramkumar"),
-                            new Claim(ClaimTypes.Role, "Admin")
-                        }, "TestAuthentication"
-                    )
-                );
+            var user = Helper.GetInValidUser();
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }

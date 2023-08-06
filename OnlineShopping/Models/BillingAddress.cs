@@ -13,6 +13,9 @@ namespace OnlineShopping.Models
         [Required] public string State { get; set; }
         [Required] public int PostalCode { get; set; }
         [Required] public double MobileNumber { get; set; }
+        [Required] public bool Default { get; set; }
+        [Required] public DateTime Created { get; set; }
+        [Required] public DateTime Updated { get; set; }
         
         public int UserId { get; set; }
         [JsonIgnore] public User User { get; set; }
