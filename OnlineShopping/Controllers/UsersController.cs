@@ -77,6 +77,9 @@ namespace OnlineShopping.Controllers
                 EmailAddress = user.EmailAddress,
                 About = user.About,
                 City = user.City,
+                Gender = Gender.NotPreferToSay.ToString(),
+                Age = 0,
+                MobileNumber = 0,
                 Role = Roles.User.GetDisplayName()
             };
 
